@@ -7,27 +7,21 @@
 # The plug-in version
 version = "0.0.1"
 
-# Paths
-path = File.expand_path('..', __FILE__)
-build_dir = [path,"build",version].join(File::SEPARATOR) + File::SEPARATOR
-source_dir = [path,"source"].join(File::SEPARATOR) + File::SEPARATOR
-
 desc "Prepares for a build"
 task :pre_build do
-	if (File.directory?(build_dir) != true)
+	if (File.directory?("build") != true)
 		Dir.mkdir(build_dir, 0755)
 	end
 
 	# Clean all the files out of there
-	glob = build_dir + "*"
-	Dir.glob(glob) do |f|
+	Dir.glob("build/*") do |f|
 		File.delete(f)
 	end
 end
 
 desc "Builds a package"
 task :build => [:pre_build] do
-	file = source_dir << "fixedHeader.js"
+	file = "source/fixedHeader.js"
 
 	File.open(file, "r") do |f|
 		source = ""
@@ -39,16 +33,43 @@ task :build => [:pre_build] do
 		source.gsub!(/@@version@@/, version)
 
 		# Save the normal file
-		normal = build_dir + "jquery.fixedHeader.js"
+		normal = "build/jquery.fixedHeader.js"
 		File.open(normal, "w") do |file|
 			file.write(source)
 		end
 
 		# And now the minified version
-		min = build_dir + "jquery.fixedHeader.min.js"
+		min = "build/jquery.fixedHeader.min.js"
 		compiled = `uglifyjs --unsafe #{normal}`
 		File.open(min, "w") do |file|
 			file.write(compiled)
 		end
 	end
+end
+
+desc "Packages up a build for distribution"
+task :package, [:version] do |t, args|
+	v = args[:version] || version # Default to main version
+
+	# Delete the file if is already exists
+	file = "packages/#{v}.zip"
+	if (File.exists?(file))
+		File.delete(file)
+	end
+
+	# Create a tmp dir to zip
+	Dir.mkdir("fixedHeader", 0755)
+	files = ["build/jquery.fixedHeader.js", "build/jquery.fixedHeader.min.js"]
+	files.each do |f|
+		`cp #{f} fixedHeader`
+	end
+
+	# Build the zip file
+	zip = `zip -rv packages/#{v}.zip fixedHeader`
+
+	# And cleanup
+	Dir.glob("fixedHeader/*") do |f|
+		File.delete(f)
+	end
+	Dir.delete("fixedHeader")
 end
