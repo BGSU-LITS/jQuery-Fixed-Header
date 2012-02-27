@@ -7,20 +7,24 @@
 # The plug-in version
 version = "0.0.1"
 
-desc "Prepares for a build"
-task :pre_build do
-	if (File.directory?("build") != true)
-		Dir.mkdir(build_dir, 0755)
+desc "Setup the development environment (only run once)"
+task :setup do
+	["build", "packages"].each do |d|
+		if (File.directory?(d) != true)
+			Dir.mkdir(d, 0755)
+		end
 	end
+end
 
-	# Clean all the files out of there
+desc "Cleans up for a build"
+task :clean do
 	Dir.glob("build/*") do |f|
 		File.delete(f)
 	end
 end
 
 desc "Builds a package"
-task :build => [:pre_build] do
+task :build => [:clean] do
 	file = "source/fixedHeader.js"
 
 	File.open(file, "r") do |f|
@@ -47,7 +51,7 @@ task :build => [:pre_build] do
 	end
 end
 
-desc "Packages up a build for distribution"
+desc "Packages the code for distribution"
 task :package, [:version] do |t, args|
 	v = args[:version] || version # Default to main version
 
