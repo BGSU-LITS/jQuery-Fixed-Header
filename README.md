@@ -3,6 +3,8 @@
 The fixedHeader jQuery plugin allows you as a developer to make sure that the
 header for a table stays at the top of the page even when scrolled out of view.
 
+## [Demo](http://ul2.bgsu.edu/labs/fixed-header/)
+
 ## Example
 
 ``` html
