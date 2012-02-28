@@ -34,11 +34,11 @@ $("#long-table").fixedHeader();
 
 ## Hacking
 
-To help develop the plugin, fork this repo. You can use `rake setup` to build
+To help develop the plugin, fork this repo. You can use `make setup` to build
 the proper development environment.
 
-You can also use `rake build` to build the normal and minified version of the code
-and `rake package` to save the code into a zip file.
+You can also use `make build` to build the normal and minified version of the code
+and `make package` to save the code into a zip file.
 
 _Code minification is done with [UglifyJS](https://github.com/mishoo/UglifyJS/)._
 
